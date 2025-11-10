@@ -104,7 +104,7 @@ def main():
     encryptor = DESEncryptor()
     
     # 配置
-    input_file = "./pattern1_data/pattern1.dat"
+    input_file = "./00_TESTBED/pattern1_data/pattern1.dat"
     output_file = "pattern_encrypted.dat"
     
     print("=" * 60)

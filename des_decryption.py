@@ -105,7 +105,7 @@ def main():
     decryptor = DESDecryptor()
     
     # 配置
-    input_file = "./pattern1_data/pattern1.dat"
+    input_file = "./00_TESTBED/pattern1_data/pattern1.dat"
     output_file = "pattern_decrypted.dat"
     
     print("=" * 60)

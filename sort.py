@@ -41,7 +41,7 @@ def process_pattern_file(input_file, output_file):
     print(f"處理的行數: {len(sorted_lines)}")
 
 if __name__ == "__main__":
-    input_file = "./pattern1_data/pattern1.dat"
+    input_file = "./00_TESTBED/pattern1_data/pattern1.dat"
     output_file = "pattern_sort.dat"
     
     try:
