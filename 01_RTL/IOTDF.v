@@ -96,8 +96,8 @@ output [127:0] iot_out;
                 if (cnt_r == 0) begin
                     data_w[63:0] = initial_permutation(data_r[63:0]);
                     cypher_key_w = PC1(data_r[127:64]);
-                    cypher_key_w[27:0] = {cypher_key_w[0], cypher_key_w[27:1]};
-                    cypher_key_w[55:28] = {cypher_key_w[28], cypher_key_w[55:29]};
+                    // cypher_key_w[27:0] = {cypher_key_w[0], cypher_key_w[27:1]};
+                    // cypher_key_w[55:28] = {cypher_key_w[28], cypher_key_w[55:29]};
                     cnt_w = cnt_r + 1;
                 end
                 else if (cnt_r == 17) begin
@@ -275,7 +275,7 @@ output [127:0] iot_out;
                 end 
                 4'b0001: begin
                     case (row_num_w)
-                        2'b00: S1 = 4; 2'b01: S1 = 15; 2'b10: S1 = 1; 2'b11: S1 = 2; 
+                        2'b00: S1 = 4; 2'b01: S1 = 15; 2'b10: S1 = 1; 2'b11: S1 = 12; 
                     endcase
                 end
                 4'b0010: begin
@@ -305,7 +305,7 @@ output [127:0] iot_out;
                 end
                 4'b0111: begin
                     case (row_num_w)
-                        2'b00: S1 = 4; 2'b01: S1 = 15; 2'b10: S1 = 1; 2'b11: S1 = 2; 
+                        2'b00: S1 = 8; 2'b01: S1 = 1; 2'b10: S1 = 11; 2'b11: S1 = 7; 
                     endcase
                 end
                 4'b1000: begin
@@ -430,7 +430,7 @@ output [127:0] iot_out;
                 end
                 4'b1110: begin
                     case (row_num_w)
-                        2'b00: S2 = 5; 2'b01: S2 = 12; 2'b10: S2 = 2; 2'b11: S2 = 14; 
+                        2'b00: S2 = 5; 2'b01: S2 = 11; 2'b10: S2 = 2; 2'b11: S2 = 14; 
                     endcase
                 end
                 4'b1111: begin
