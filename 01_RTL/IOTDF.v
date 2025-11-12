@@ -25,6 +25,8 @@ output [127:0] iot_out;
     reg [2:0]   crc_prev_r, crc_prev_w;
     reg         busy, valid;
 
+    integer i;
+
     wire [6:0] index_w = cnt_r << 3;
     wire [47:0] sub_key_w = PC2(cypher_key_r);
 
@@ -122,7 +124,30 @@ output [127:0] iot_out;
                 
             end
             S_SORT: begin
-                
+                if (cnt_r == 16) begin
+                    state_w = S_DONE;
+                    cnt_w = 0;
+                end
+                else begin
+                    state_w = S_SORT;
+                    cnt_w = cnt_r + 1;
+                    if (cnt_r[0]) begin
+                        for (i = 0; i < 16; i = i + 2) begin
+                            if (data_r[i * 8 +: 8] > data_r[(i + 1) * 8 +: 8]) begin
+                                data_w[i * 8 +: 8] = data_r[(i + 1) * 8 +: 8];
+                                data_w[(i + 1) * 8 +: 8] = data_r[i * 8 +: 8];
+                            end
+                        end
+                    end
+                    else begin
+                        for (i = 1; i < 15; i = i + 2) begin
+                            if (data_r[i * 8 +: 8] > data_r[(i + 1) * 8 +: 8]) begin
+                                data_w[i * 8 +: 8] = data_r[(i + 1) * 8 +: 8];
+                                data_w[(i + 1) * 8 +: 8] = data_r[i * 8 +: 8];
+                            end
+                        end
+                    end
+                end
             end
             S_DONE: begin
                 valid = 1;
