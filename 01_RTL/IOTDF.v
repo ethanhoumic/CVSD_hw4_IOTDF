@@ -19,29 +19,34 @@ output [127:0] iot_out;
 
     reg [2:0]   state_r, state_w;
     reg [127:0] data_r, data_w, iot_out;
-    reg [4:0]   cnt_r, cnt_w;
+    reg [6:0]   cnt_r, cnt_w;
     reg [55:0]  cypher_key_r, cypher_key_w;
-    reg [10:0]  crc_data_r, crc_data_w;
-    reg [2:0]   crc_prev_r, crc_prev_w;
+    reg [3:0]   crc_temp1_w;
+    reg [3:0]   crc_one_r, crc_one_w;
     reg         busy, valid;
 
     integer i;
 
     wire [6:0] index_w = cnt_r << 3;
     wire [47:0] sub_key_w = PC2(cypher_key_r);
+    wire xor1_w = crc_one_r[3];
+    wire xor2_w = crc_temp1_w[3];
+    wire pad_1_w = (cnt_r >= 4) ? data_r[cnt_r - 4] : 0;
+    wire pad_2_w = (cnt_r >= 5) ? data_r[cnt_r - 5] : 0;
 
-    wire cypher_key__en = (state_r == S_ENC || state_r == S_DEC);
+
+    wire cypher_key_en = (state_r == S_ENC || state_r == S_DEC);
 
     always @(*) begin
         state_w = state_r;
         data_w = data_r;
         cnt_w = cnt_r;
         cypher_key_w = cypher_key_r;
-        crc_data_w = crc_data_r;
-        crc_prev_w = crc_prev_r;
+        crc_one_w = crc_one_r;
         busy = 1;
         valid = 0;
         iot_out = data_r;
+        crc_temp1_w = data_r[127 -: 4];
         case (state_r)
             S_IDLE: begin
                 state_w = S_LOAD;
@@ -55,11 +60,13 @@ output [127:0] iot_out;
                         case (fn_sel)
                             1: state_w = S_ENC;
                             2: state_w = S_DEC;
-                            3: state_w = S_CRC;
+                            3: begin
+                                state_w = S_CRC;
+                                crc_one_w = data_w[127:124];
+                            end
                             4: state_w = S_SORT;
-                            default: state_w = S_ENC;
                         endcase
-                        cnt_w = 0;
+                        cnt_w = (state_w == S_CRC) ? 127 : 0;
                         busy = 1;
                     end
                     else begin
@@ -121,7 +128,17 @@ output [127:0] iot_out;
                 end
             end
             S_CRC: begin
-                
+                // Process first bit
+                crc_temp1_w = xor1_w ? {(crc_one_r[2:0] ^ 3'b101), pad_1_w} : {crc_one_r[2:0], pad_1_w};
+                // Process second bit
+                crc_one_w = xor2_w ? {(crc_temp1_w[2:0] ^ 3'b101), pad_2_w} : {crc_temp1_w[2:0], pad_2_w};
+                cnt_w = cnt_r - 2;
+                if (cnt_r == 1) begin
+                    state_w = S_DONE;
+                    cnt_w = 0;
+                    data_w = {125'b0, crc_one_w[3:1]};  // Output final 3-bit CRC
+                    crc_one_w = 3'b0;
+                end
             end
             S_SORT: begin
                 if (cnt_r == 16) begin
@@ -162,16 +179,14 @@ output [127:0] iot_out;
             data_r <= 0;
             cnt_r <= 0;
             cypher_key_r <= 0;
-            crc_data_r <= 0;
-            crc_prev_r <= 0;
+            crc_one_r <= 0;
         end
         else begin
             state_r <= state_w;
             data_r <= data_w;
             cnt_r <= cnt_w;
-            crc_data_r <= crc_data_w;
-            crc_prev_r <= crc_prev_w;
-            if (cypher_key__en) begin
+            crc_one_r <= crc_one_w;
+            if (cypher_key_en) begin
                 cypher_key_r <= cypher_key_w;
             end
         end
