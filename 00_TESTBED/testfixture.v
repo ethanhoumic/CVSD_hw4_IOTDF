@@ -1,5 +1,5 @@
 `timescale 1ns/10ps
-`define SDFFILE     "./IOTDF_syn.sdf"     //Modify your sdf file name
+`define SDFFILE     "../02_SYN/Netlist/IOTDF_syn.sdf"     //Modify your sdf file name
 `define CYCLE       6.5                   //Modify your CYCLE 
 `define DEL         1.0
 `define PAT_NUM     64
@@ -164,22 +164,34 @@ end
 
 always begin #(`CYCLE/2)  clk = ~clk; end
 
-
-initial begin
-//$dumpfile("IOTDF.vcd");
-//$dumpvars;
-`ifdef F2
-$fsdbDumpfile("IOTDF_F2.fsdb");
-`elsif F3
-$fsdbDumpfile("IOTDF_F3.fsdb");
-`elsif F4
-$fsdbDumpfile("IOTDF_F4.fsdb");
+`ifdef vcd
+   initial begin
+   `ifdef F2
+   $dumpfile("IOTDF_F2.vcd");
+   `elsif F3
+   $dumpfile("IOTDF_F3.vcd");
+   `elsif F4
+   $dumpfile("IOTDF_F4.vcd");
+   `else
+   $dumpfile("IOTDF_F1.vcd");
+   `endif
+   $dumpvars;
+   end
 `else
-$fsdbDumpfile("IOTDF_F1.fsdb");
+   initial begin
+   `ifdef F2
+   $fsdbDumpfile("IOTDF_F2.fsdb");
+   `elsif F3
+   $fsdbDumpfile("IOTDF_F3.fsdb");
+   `elsif F4
+   $fsdbDumpfile("IOTDF_F4.fsdb");
+   `else
+   $fsdbDumpfile("IOTDF_F1.fsdb");
+   `endif
+   $fsdbDumpvars;
+   $fsdbDumpMDA;
+   end
 `endif
-$fsdbDumpvars;
-$fsdbDumpMDA;
-end
 
 initial begin
    @(posedge clk)  #`DEL  rst = 1'b1;
