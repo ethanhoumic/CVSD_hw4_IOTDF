@@ -1,6 +1,6 @@
 `timescale 1ns/10ps
-`define SDFFILE     "../02_SYN/Netlist/IOTDF_syn.sdf"     //Modify your sdf file name
-`define CYCLE       6.5                   //Modify your CYCLE 
+`define SDFFILE     "IOTDF_syn.sdf"     //Modify your sdf file name
+`define CYCLE       4.5                   //Modify your CYCLE 
 `define DEL         1.0
 `define PAT_NUM     64
 `define End_CYCLE   1000000 

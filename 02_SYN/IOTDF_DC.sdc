@@ -1,7 +1,7 @@
 # operating conditions and boundary conditions #
 
 
-create_clock -name clk  -period 6.5   [get_ports  clk]      ;#Modify period by yourself
+create_clock -name clk  -period 4.5   [get_ports  clk]      ;#Modify period by yourself
 
 set_dont_touch_network      [all_clocks]
 set_fix_hold                [all_clocks]
@@ -22,6 +22,6 @@ set_drive        0.1   [all_inputs]
 
 set_operating_conditions -max_library slow -max slow
 
-set_max_fanout 10 [all_inputs]
+set_max_fanout 1000 [all_inputs]
 
 
