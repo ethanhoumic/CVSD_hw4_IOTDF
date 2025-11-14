@@ -34,8 +34,10 @@ output [127:0] iot_out;
     wire pad_1_w = (cnt_r >= 4) ? data_r[cnt_r - 4] : 0;
     wire pad_2_w = (cnt_r >= 5) ? data_r[cnt_r - 5] : 0;
 
-
     wire cypher_key_en = (state_r == S_ENC || state_r == S_DEC);
+    wire crc_en = (state_r == S_CRC || state_r == S_LOAD);
+    wire high_en = (state_r == S_LOAD) || (state_r == S_SORT) || (state_r == S_CRC && cnt_r == 1);
+    wire low_en = (state_r == S_LOAD) || (state_r == S_SORT) || (state_r == S_DEC) || (state_r == S_ENC) || (state_r == S_CRC && cnt_r == 1);
 
     always @(*) begin
         state_w = state_r;
@@ -183,11 +185,18 @@ output [127:0] iot_out;
         end
         else begin
             state_r <= state_w;
-            data_r <= data_w;
             cnt_r <= cnt_w;
-            crc_one_r <= crc_one_w;
             if (cypher_key_en) begin
                 cypher_key_r <= cypher_key_w;
+            end
+            if (high_en) begin
+                data_r[127:64] <= data_w[127:64];
+            end
+            if (low_en) begin
+                data_r[63:0] <= data_w[63:0];
+            end
+            if (crc_en) begin
+                crc_one_r <= crc_one_w;
             end
         end
     end
